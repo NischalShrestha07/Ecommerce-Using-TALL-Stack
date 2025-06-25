@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
+use Filament\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Group;
@@ -14,10 +15,14 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Support\Markdown;
 use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -25,7 +30,7 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-beaker';
 
     public static function form(Form $form): Form
     {
@@ -35,11 +40,29 @@ class ProductResource extends Resource
                     Section::make('Product Information')->schema([
                         TextInput::make('name')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (string $operation, $state, Set $set) {
+                                if ($operation !== 'create') {
+                                    return;
+                                }
+                                $set('slug', Str::slug($state));
+                            }),
+
+                        // above and below code does same thing
+                        // TextInput::make('name')
+                        //     ->required()
+                        //     ->live(onBlur: true)
+                        //     ->afterStateUpdated(fn(string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null)
+                        //     ->maxLength(255),
 
                         TextInput::make('slug')
                             ->required()
-                            ->maxLength(255)->disabled(),
+                            ->maxLength(255)
+                            ->disabled()
+                            ->dehydrated()
+                            ->unique(Product::class, 'slug', ignoreRecord: true),
+
                         MarkdownEditor::make('description')
                             ->columnSpanFull()
                             ->fileAttachmentsDirectory('products')
@@ -103,14 +126,51 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('name')
+                    ->searchable(),
+
+                TextColumn::make('category.name')
+                    ->sortable(),
+
+                TextColumn::make('brand.name')
+                    ->sortable(),
+
+                TextColumn::make('price')
+                    ->money('NRS')
+                    ->sortable(),
+
+                IconColumn::make('is_featured')
+                    ->boolean(),
+                IconColumn::make('on_sale')
+                    ->boolean(),
+                IconColumn::make('in_stock')
+                    ->boolean(),
+                IconColumn::make('is_active')
+                    ->boolean(),
+
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+
+                ])
             ])
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
