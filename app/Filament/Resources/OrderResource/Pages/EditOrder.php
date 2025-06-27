@@ -28,7 +28,7 @@ class EditOrder extends EditRecord
     {
         return Notification::make()
             ->success()
-            ->title('Brand Updated.')
-            ->body('The Brand has been updated successfully.');
+            ->title('Order Updated.')
+            ->body('The Order has been updated successfully.');
     }
 }
