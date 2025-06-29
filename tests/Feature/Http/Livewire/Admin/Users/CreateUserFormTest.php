@@ -1,21 +1,20 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Http\Livewire\Admin\Users;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class ProductTest extends TestCase
+class CreateUserFormTest extends TestCase
 {
     /**
      * A basic feature test example.
      */
     public function test_example(): void
     {
-        // $response = $this->get('/brands');
+        $response = $this->get('/');
 
-        // $response->assertStatus(200);
-        // $response->assertStatus(__(key: 'No products found.'));
+        $response->assertStatus(200);
     }
 }

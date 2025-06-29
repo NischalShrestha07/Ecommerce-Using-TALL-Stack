@@ -227,18 +227,23 @@ class OrderResource extends Resource
                     ->label('Payment Method')
                     ->sortable()
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('payment_status')
                     ->label('Payment Status')
+                    ->badge()
                     ->sortable()
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('currency')
                     ->label('Currency')
                     ->sortable()
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('shipping_method')
                     ->label('Shipping Method')
                     ->sortable()
                     ->searchable(),
+
                 Tables\Columns\SelectColumn::make('status')
                     ->label('Order Status')
                     ->options([
@@ -250,11 +255,13 @@ class OrderResource extends Resource
                     ])
                     ->sortable()
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Updated At')
                     ->dateTime()
