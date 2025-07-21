@@ -7,13 +7,14 @@
 
     <title>{{ $title ?? 'Page Title' }}</title>
 
-    @vite('resources/css/app.css','resources/js/app.js')
+    {{-- @vite('resources/css/app.css','resources/js/app.js') --}}
     @livewireStyles
 </head>
 
 <body class="bg-slate-200 dark:bg-slate-700">
     <main>
         {{ $slot }}
+        @livewire('wire-elements-modal')
     </main>
     @livewireScripts
 </body>
